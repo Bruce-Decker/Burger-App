@@ -43,7 +43,7 @@ var curr_dir = process.cwd()
 app.use(express.static("/"));
 
 
-
+app.use("/app.js", express.static(__dirname + '/app.js'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
@@ -129,11 +129,11 @@ app.get('/payment', function(req, res) {
     res.sendFile(curr_dir +'/views/payment.html')
 })
 
-app.get('/employee', function(req, res) {
-    res.sendFile(curr_dir +'/views/employee.html')
+app.get('/addEmployee', function(req, res) {
+    res.sendFile(curr_dir +'/views/addEmployee.html')
 })
 
-app.post('/employee', function(req, res) {
+app.post('/addEmployee', function(req, res) {
     var Firstname = req.body.firstname;
     var LastName = req.body.lastname;
     var Gender = req.body.gender;
@@ -141,7 +141,7 @@ app.post('/employee', function(req, res) {
     var ID = parseInt(req.body.id, 10);
     var Salary = parseInt(req.body.salary, 10);
 
-  axios.post('http://localhost:3000/employee', {
+  axios.post('http://localhost:5000/employee', {
         FirstName: Firstname,
         LastName: LastName,
         Gender: Gender,
@@ -155,7 +155,27 @@ app.post('/employee', function(req, res) {
   .catch(function (error) {
     console.log(error);
   });
-              res.redirect("/employee");
+              res.redirect("/addEmployee");
+})
+
+
+app.get('/showEmployees', function(req, res) {
+    res.sendFile(curr_dir +'/views/showEmployees.html')
+})
+
+
+app.get('/searchEmployee', function(req, res) {
+    res.sendFile(curr_dir +'/views/searchEmployee.html')
+})
+
+app.get('/showSearchEmployee', function(req, res) {
+    res.sendFile(curr_dir +'/views/showSearchEmployee.html')
+})
+
+
+app.post('/showSearchEmployee', function(req, res) {
+  
+     res.redirect("/showSearchEmployee");
 })
 
 
@@ -164,3 +184,87 @@ app.post('/employee', function(req, res) {
 
 app.listen(4000);
 console.log("Running app at port 4000");
+
+
+
+function EmployeeReport() {
+  var $s = $('#result');
+  var extra_space = '&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+
+  var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+  axios.get('http://localhost:5000/employees')
+    .then(function (response) {
+      for (var i = 0; i < response.data.length; i ++) {
+           $s.append('<tbody> <tr>');
+           $s.append('<td>' + space + response.data[i].firstname + extra_space + extra_space + extra_space + extra_space + extra_space + space + space  + '</td>')
+           $s.append('<td>' + response.data[i].lastname + extra_space + extra_space + extra_space + extra_space + space + space + space +'</td>')
+           $s.append('<td>' + response.data[i].gender + extra_space + extra_space + extra_space + extra_space + space + '</td>')
+           $s.append('<td>' + response.data[i].age +  extra_space + extra_space + extra_space + '</td>')
+           $s.append('<td>' + response.data[i].salary + '</td>')
+           $s.append('  </tr>' + ' </tbody> ')
+      }
+     
+       console.log(response.data[0].firstname)
+       console.log(response.data.length)
+    })
+    .catch(function (error) {
+      //resultElement.innerHTML = generateErrorHTMLOutput(error);
+    });   
+
+    $s.append(' </table>')
+}
+
+
+function searchEmployee() {
+   var $s = $('#result');
+  
+
+  $('#search_employee_button').on('click', function() { 
+    var ID = $('#search_employee_field').val()
+    var extra_space = '&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+
+  var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+   
+     axios.get('http://localhost:5000/employee/'+ID)
+    .then(function(response) {
+     
+        localStorage.setItem("employee_first_name", response.data.firstname);
+        localStorage.setItem("employee_last_name", response.data.lastname);
+        localStorage.setItem("employee_gender", response.data.gender);
+        localStorage.setItem("employee_age", response.data.age);
+        localStorage.setItem("employee_salary", response.data.salary)
+         localStorage.setItem("employee_id", ID);
+    }); 
+
+
+  })
+
+}
+
+
+function showSearchEmployee() {
+    var firstname = localStorage.getItem("employee_first_name")
+    var lastname = localStorage.getItem("employee_last_name")
+    var gender = localStorage.getItem("employee_gender")
+    var age = localStorage.getItem("employee_age")
+    var salary = localStorage.getItem("employee_salary")
+    var id = localStorage.getItem("employee_id")
+    var $s = $('#result');
+    var $showID = $('#showID');
+    $showID.append('<h1> Employee ID ' + id + ' Basic Info </h1>')
+    var extra_space = '&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+
+  var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+  var small_space = '&nbsp;&nbsp;&nbsp;';
+   
+    $s.append('<tbody> <tr>');
+    $s.append('<td>' + space + firstname + extra_space + extra_space + extra_space + extra_space + extra_space + space + space  + '</td>')
+    $s.append('<td>' + lastname + extra_space + extra_space + extra_space + extra_space + space + space + space + space + small_space +'</td>')
+    $s.append('<td>' + gender + extra_space + extra_space + extra_space + extra_space + space + '</td>')
+    $s.append('<td>' + age +  extra_space + extra_space + extra_space + '</td>')
+    $s.append('<td>' + salary + '</td>')
+    $s.append('  </tr>' + ' </tbody> ')
+
+
+
+}
