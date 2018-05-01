@@ -3,7 +3,7 @@ version: '3'
 services:
 
   goapi:
-    build: .
+    image: iamdeowanshi/goapi
     container_name: "goapi"
     networks:
       - webnet
