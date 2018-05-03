@@ -15,6 +15,35 @@ var mongoose = require('mongoose');
 var User = require("./models/user");
 var axios = require("axios");
 
+
+//Blockchain dependencies
+const Blockchain = require('./blockchain');
+const P2pServer = require('./p2p-server')
+
+
+const bc = new Blockchain();
+const p2pServer = new P2pServer(bc);
+app.use(bodyParser.json())
+app.use(bodyParser.json())
+
+app.get('/blocks', function(req, res) {
+   res.json(bc.chain)
+})
+
+app.post('/mine', function(req, res) {
+  const block = bc.addBlock(req.body.data)
+
+  console.log(`New block added: ${block.toString()}`);
+  p2pServer.syncChains();
+  res.redirect('/blocks')
+})
+
+
+app.get('/showBlockchain', function(req, res) {
+  res.sendFile(curr_dir +'/views/showBlockchain.html')
+})
+
+
 /*
 
 axios.get('http://localhost:3000/employees')
@@ -70,14 +99,15 @@ app.get('/secondary_landing', isLoggedIn, function(req, res) {
    
 })
 
-/*
 
+/*
 app.use(function(req,res,next){
   res.locals.currentUser = req.user;
-  console.log(req.user)
+  console.log(res.locals.currentUser)
   next();
 })
 */
+
 
 app.post("/signup", function(req, res) {
 	User.register(new User({username: req.body.username}), req.body.password, function(err, user) {
@@ -183,7 +213,16 @@ app.post('/showSearchEmployee', function(req, res) {
 
 
 app.listen(4000);
+p2pServer.listen();
 console.log("Running app at port 4000");
+
+function userInfo() {
+   
+     $('#sign_in_button').on('click', function() { 
+        alert($('#login_username').val())
+        localStorage.setItem("username", $('#login_username').val());
+     })
+}
 
 
 
