@@ -28,22 +28,6 @@ const p2pServer = new P2pServer(bc);
 app.use(bodyParser.json())
 app.use(bodyParser.json())
 
-app.get('/blocks', function(req, res) {
-   res.json(bc.chain)
-})
-
-app.post('/mine', function(req, res) {
-  const block = bc.addBlock(req.body.data)
-
-  console.log(`New block added: ${block.toString()}`);
-  p2pServer.syncChains();
-  res.redirect('/blocks')
-})
-
-
-app.get('/showBlockchain', function(req, res) {
-  res.sendFile(curr_dir +'/views/showBlockchain.html')
-})
 
 
 /*
@@ -80,6 +64,40 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json({limit: '50mb'}));
+
+
+
+
+
+app.get('/blocks', function(req, res) {
+   res.json(bc.chain)
+})
+
+app.post('/mine', function(req, res) {
+
+  const block = bc.addBlock(req.body.data)
+
+  console.log(`New block added: ${block.toString()}`);
+  p2pServer.syncChains();
+  res.redirect('/addBlockchain')
+})
+
+
+app.get('/showBlockchain', function(req, res) {
+  res.sendFile(curr_dir +'/views/showBlockchain.html')
+})
+
+app.get('/addBlockchain', function(req, res) {
+  res.sendFile(curr_dir +'/views/addBlockchain.html')
+})
+
+app.post('/addBlockchain', function(req, res) {
+  console.log("sdsdfsdf")
+    var blockData = req.body.blockData;
+    console.log(blockData)
+    res.redirect("/addBlockchain");
+})
+
 
 
 
@@ -169,6 +187,7 @@ app.get('/addEmployee', function(req, res) {
 
 app.post('/addEmployee', function(req, res) {
     var Firstname = req.body.firstname;
+
     var LastName = req.body.lastname;
     var Gender = req.body.gender;
     var Age = parseInt(req.body.age, 10);
@@ -214,6 +233,29 @@ app.get('/showSearchEmployee', function(req, res) {
 app.post('/showSearchEmployee', function(req, res) {
   
      res.redirect("/showSearchEmployee");
+})
+
+app.get('/deleteEmployee', function(req, res) {
+
+  res.sendFile(curr_dir +'/views/deleteEmployee.html')
+
+})
+
+
+app.post('/deleteEmployee', function(req, res) {
+  var ID = req.body.deleteEmployee_id
+ 
+  axios.delete('http://localhost:5000/employee/delete/'+ID)
+    .then(function(response) {
+     
+    })
+     .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+    res.redirect("/deleteEmployee");
 })
 
 app.post('/payment', function(req, res) {
@@ -301,20 +343,22 @@ function EmployeeReport() {
   var extra_space = '&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 
   var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+  $s.append( '<table class = "table">')
+  $s.append('<thead> <tr> <th> ID </th>  <th>  First Name  </th><th>  Last Name  </th> <th>  Gender  </th> <th>  Age </th> <th>  Salary  </th> </tr> </thead>');
   axios.get('http://localhost:5000/employees')
     .then(function (response) {
       for (var i = 0; i < response.data.length; i ++) {
            $s.append('<tbody> <tr>');
-           $s.append('<td>' + space + response.data[i].firstname + extra_space + extra_space + extra_space + extra_space + extra_space + space + space  + '</td>')
-           $s.append('<td>' + response.data[i].lastname + extra_space + extra_space + extra_space + extra_space + space + space + space +'</td>')
-           $s.append('<td>' + response.data[i].gender + extra_space + extra_space + extra_space + extra_space + space + '</td>')
-           $s.append('<td>' + response.data[i].age +  extra_space + extra_space + extra_space + '</td>')
-           $s.append('<td>' + response.data[i].salary + '</td>')
+             $s.append('<td>' + response.data[i].id   + space + extra_space +  '</td>')
+           $s.append('<td>' +  response.data[i].firstname   + space + extra_space + '</td>')
+           $s.append('<td>' + response.data[i].lastname + space + extra_space + '</td>')
+           $s.append('<td>' + response.data[i].gender + space + extra_space +'</td>')
+           $s.append('<td>' + response.data[i].age +  space + extra_space +'</td>')
+           $s.append('<td>' + response.data[i].salary + extra_space +'</td>')
            $s.append('  </tr>' + ' </tbody> ')
       }
      
-       console.log(response.data[0].firstname)
-       console.log(response.data.length)
+      
     })
     .catch(function (error) {
       //resultElement.innerHTML = generateErrorHTMLOutput(error);
@@ -330,9 +374,7 @@ function searchEmployee() {
 
   $('#search_employee_button').on('click', function() { 
     var ID = $('#search_employee_field').val()
-    var extra_space = '&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-
-  var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+    
    
      axios.get('http://localhost:5000/employee/'+ID)
     .then(function(response) {
@@ -365,14 +407,18 @@ function showSearchEmployee() {
 
   var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
   var small_space = '&nbsp;&nbsp;&nbsp;';
+
+    $s.append( '<table class = "table">')
+    $s.append('<thead> <tr>   <th>  First Name  </th><th>  Last Name  </th> <th>  Gender  </th> <th>  Age </th> <th>  Salary  </th> </tr> </thead>')
    
     $s.append('<tbody> <tr>');
-    $s.append('<td>' + space + firstname + extra_space + extra_space + extra_space + extra_space + extra_space + space + space  + '</td>')
-    $s.append('<td>' + lastname + extra_space + extra_space + extra_space + extra_space + space + space + space + space + small_space +'</td>')
-    $s.append('<td>' + gender + extra_space + extra_space + extra_space + extra_space + space + '</td>')
-    $s.append('<td>' + age +  extra_space + extra_space + extra_space + '</td>')
+    $s.append('<td>' + firstname + space  + space + '</td>')
+    $s.append('<td>' + lastname +  space + extra_space + '</td>')
+    $s.append('<td>' + gender +  space + space + '</td>')
+    $s.append('<td>' + age +  space + space + '</td>')
     $s.append('<td>' + salary + '</td>')
     $s.append('  </tr>' + ' </tbody> ')
+    $s.append('</table>');
 
 
 
@@ -396,13 +442,13 @@ function showPayment() {
            $s.append('<td>' + response.data[i].UserId + space + '</td>')
            $s.append('<td>' + response.data[i].CardNumber + space + '</td>')
            $s.append('<td>' + response.data[i].OrderId +  space +  '</td>')
-           $s.append('<td>' + response.data[i].CardHolderName + space + '</td>')
+            $s.append('<td>' + response.data[i].CardType +  space + space + '</td>')
+           $s.append('<td>' + response.data[i].CardHolderName + space + space +'</td>')
             $s.append('<td>' + response.data[i].Amount+ '</td>')
             $s.append('  </tr>' + ' </tbody> ')
       }
    
-       console.log(response.data[0].firstname)
-       console.log(response.data.length)
+      
     })
     .catch(function (error) {
       //resultElement.innerHTML = generateErrorHTMLOutput(error);
@@ -410,3 +456,36 @@ function showPayment() {
 $s.append('</table>');
 
 }
+
+
+function showBlockchain() {
+   var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+  var small_space = '&nbsp;&nbsp;&nbsp;';
+      var $s = $('#result');
+      $s.append( '<table class = "table">')
+      $s.append(' <thead> <tr>   <th>  Time Stamp  </th><th>  Last Hash  </th> <th>  Hash  </th> <th>  Data </th> <th>  Nonce </th> <th>  Difficulty </th> </tr> </thead>')
+      axios.get('/blocks')
+    .then(function (response) {
+      for (var i = 0; i < response.data.length; i ++) {
+          $s.append('<tbody> <tr>');
+           $s.append('<td>'  + response.data[i].timestamp + space + '</td>')
+           $s.append('<td>' + response.data[i].lastHash + space + '</td>')
+           $s.append('<td>' + response.data[i].hash + space + '</td>')
+           $s.append('<td>' + response.data[i].data +  space +  '</td>')
+            $s.append('<td>' + response.data[i].nonce +  space + space + '</td>')
+           $s.append('<td>' + response.data[i].difficulty+ space + space +'</td>')
+          
+            $s.append('  </tr>' + ' </tbody> ')
+          
+      }
+   
+     
+    })
+    .catch(function (error) {
+      //resultElement.innerHTML = generateErrorHTMLOutput(error);
+    });   
+
+
+}
+
+

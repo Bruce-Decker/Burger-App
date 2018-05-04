@@ -23,7 +23,7 @@
 
 </head>
 
-<body background = "background.jpg" onload = "EmployeeReport()">
+<body background = "background.jpg" onload = "showBlockchain()">
 
 	<nav class="navbar navbar-default navbar" role="navigation">
   <div class="container-fluid">
@@ -41,13 +41,17 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href="https://vr.google.com"><img src="mcdonalds.png"  height = 25  width = 30 scale="0"> McDonalds</a></li>
-        <li><a href="https://unity3d.com"> <img src="white_castle.png"  height = 30  width = 30 scale="0"> White Castle </a></li>
+         <li><a href="https://www.mcdonalds.com/us/en-us.html"><img src="mcdonalds.png"  height = 25  width = 30 scale="0"> McDonalds</a></li>
+        <li><a href="https://www.whitecastle.com/"> <img src="white_castle.png"  height = 30  width = 30 scale="0"> White Castle </a></li>
           
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"> More Resources <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li><a href="/payment">Payment History</a></li>
+            <li><a href="/secondary_landing">Order Food</a></li>
+            <li class="divider"></li>
+            <li><a href="/payment">Submit Payment </a></li>
+             <li class="divider"></li>
+             <li><a href="/paymentHistory">Payment History </a></li>
              <li class="divider"></li>
             <li><a href="#">Order History</a></li>
             <li class="divider"></li>
@@ -56,6 +60,9 @@
             <li><a href="/showEmployees"> Show all Employees</a></li>
             <li class="divider"></li>
             <li><a href="/searchEmployee"> Search Employee</a></li>
+             <li class="divider"></li>
+            <li><a href="/addBlockchain"> Add Blockchain </a></li>
+           
            
           </ul>
         </li>
@@ -76,18 +83,13 @@
   </div><!-- /.container-fluid -->
 </nav>
 <div class = "colaPicture">
-  <img src="cola_animation.gif" style ="height: 200px; width:100%;">
+  <img src="bitcoin_banner.gif" style ="height: 300px; width:100%;">
 
 </div>
 <div class = "well">
 
   <div id = "result">
-             <h1> Employees Table </h1>
-
-             <table class = "table">
-              
-              <thead> <tr>   <th>  First Name  </th><th>  Last Name  </th> <th>  Gender  </th> <th>  Age </th> <th>  Salary  </th> </tr> </thead>
-            </table>
+            
             
   </div>
 </div>
