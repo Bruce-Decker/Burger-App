@@ -14,6 +14,8 @@ var mongo = require('mongodb')
 var mongoose = require('mongoose');
 var User = require("./models/user");
 var axios = require("axios");
+var LocalStorage = require('node-localstorage').LocalStorage,
+localStorage = new LocalStorage('./scratch');
 
 
 //Blockchain dependencies
@@ -103,10 +105,12 @@ app.get('/secondary_landing', isLoggedIn, function(req, res) {
 /*
 app.use(function(req,res,next){
   res.locals.currentUser = req.user;
+  localStorage.setItem("username", JSON.stringify(req.user))
   console.log(res.locals.currentUser)
   next();
 })
 */
+
 
 
 app.post("/signup", function(req, res) {
@@ -190,6 +194,8 @@ app.post('/addEmployee', function(req, res) {
 
 
 app.get('/showEmployees', function(req, res) {
+  localStorage.setItem("username", JSON.stringify(req.user.username))
+    console.log(localStorage.getItem("username").replace(/\"/g, ""))
     res.sendFile(curr_dir +'/views/showEmployees.html')
 })
 
@@ -199,6 +205,8 @@ app.get('/searchEmployee', function(req, res) {
 })
 
 app.get('/showSearchEmployee', function(req, res) {
+    
+
     res.sendFile(curr_dir +'/views/showSearchEmployee.html')
 })
 
@@ -208,7 +216,40 @@ app.post('/showSearchEmployee', function(req, res) {
      res.redirect("/showSearchEmployee");
 })
 
+app.post('/payment', function(req, res) {
+    var OrderID = "ABJKLDSJFSDLF";
+    var CardHolderName = req.body.CardHolderName;
+    var cardNumber = parseInt(req.body.cardNumber, 10);
+    var cardType = req.body.cardType;
+    var amount = parseInt(req.body.amount, 10);
+    //var userID = localStorage.getItem("username")
+    
+     localStorage.setItem("username", JSON.stringify(req.user.username))
+     var userID = localStorage.getItem("username").replace(/\"/g, "")
 
+
+    //var userID = "Bruce.d"
+
+  axios.post('http://18.205.192.131:80/payment', {
+        OrderId: OrderID,
+        CardHolderName: CardHolderName,
+        CardNumber: cardNumber,
+        CardType: cardType,
+        UserId: userID,
+        Amount: amount
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+              res.redirect("/payment");
+})
+
+app.get('/paymentHistory', function(req, res) {
+     res.sendFile(curr_dir + '/views/paymentHistory.html')
+})
 
 
 
@@ -221,8 +262,37 @@ function userInfo() {
      $('#sign_in_button').on('click', function() { 
         alert($('#login_username').val())
         localStorage.setItem("username", $('#login_username').val());
+        sendUserInfo()
+       
      })
 }
+
+app.get('/userInfo', function(req, res) {
+  res.send(req.data.username)
+  
+
+})
+
+
+
+function sendUserInfo() {
+    var username = localStorage.getItem("username")
+    alert("User name is " + username)
+    axios.get('/userInfo', {
+      username: username
+       
+  })
+  .then(function (response) {
+    response.send(username)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+
+
+}
+
+
 
 
 
@@ -305,5 +375,38 @@ function showSearchEmployee() {
     $s.append('  </tr>' + ' </tbody> ')
 
 
+
+}
+
+function showPayment() {
+    
+     var userID = localStorage.getItem("username")
+     var space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+      var $s = $('#result');
+      $s.append( '<table class = "table">')
+      $s.append(' <thead> <tr>   <th>  Serial Number  </th><th>  User Id  </th> <th>  Card Number  </th> <th>  Order Id </th> <th>  Card Type </th> <th>  Card Holde Name </th>< <th>  Amount </th>/tr> </thead>')
+      
+
+  axios.get('http://18.205.192.131:80/payment/' + userID)
+    .then(function (response) {
+      for (var i = 0; i < response.data.length; i ++) {
+          
+          $s.append('<tbody> <tr>');
+           $s.append('<td>'  + response.data[i].Id + space + '</td>')
+           $s.append('<td>' + response.data[i].UserId + space + '</td>')
+           $s.append('<td>' + response.data[i].CardNumber + space + '</td>')
+           $s.append('<td>' + response.data[i].OrderId +  space +  '</td>')
+           $s.append('<td>' + response.data[i].CardHolderName + space + '</td>')
+            $s.append('<td>' + response.data[i].Amount+ '</td>')
+            $s.append('  </tr>' + ' </tbody> ')
+      }
+   
+       console.log(response.data[0].firstname)
+       console.log(response.data.length)
+    })
+    .catch(function (error) {
+      //resultElement.innerHTML = generateErrorHTMLOutput(error);
+    });   
+$s.append('</table>');
 
 }
