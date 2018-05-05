@@ -105,7 +105,7 @@ function createBurger(){
         Description : description,
         Code : productCode
     } 
-    axios.post('http://localhost:3305/createitem',burgerData)
+    axios.post('http://52.53.149.11:3305/createitem',burgerData)
     .then(function (response) {
         console.log(response.data.Item);
         alert(response.data.Item);
@@ -127,7 +127,7 @@ function updatePrice(){
         Description : "description",
         Code : code
     }
-      axios.put('http://localhost:3305/item',burgerData)
+      axios.put('http://52.53.149.11:3305/item',burgerData)
       .then(function (response) {
           console.log(response);
           alert(response.data.Item);
