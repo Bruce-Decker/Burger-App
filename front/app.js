@@ -195,7 +195,7 @@ app.post('/addEmployee', function(req, res) {
     var ID = parseInt(req.body.id, 10);
     var Salary = parseInt(req.body.salary, 10);
 
-  axios.post('http://54.67.33.0:5000/employee', {
+  axios.post('http://54.67.33.0:80/employee', {
         FirstName: Firstname,
         LastName: LastName,
         Gender: Gender,
