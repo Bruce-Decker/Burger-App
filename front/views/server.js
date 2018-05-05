@@ -16,5 +16,7 @@ app.get('/',(req,res) => {
     res.sendfile('./burger.html');
 } );
 
-
+app.get('/review',(req,res)=>{
+    res.sendfile('./PuristReview.html');
+});
 module.exports = app;
