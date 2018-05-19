@@ -266,7 +266,7 @@ app.post('/payment', function(req, res) {
     var cardType = req.body.cardType;
     var amount = parseInt(req.body.amount, 10);
     //var userID = localStorage.getItem("username")
-    
+    console.log(localStorage.getItem("orderid"))
      localStorage.setItem("username", JSON.stringify(req.user.username))
      var userID = localStorage.getItem("username").replace(/\"/g, "")
 
@@ -287,7 +287,7 @@ app.post('/payment', function(req, res) {
   .catch(function (error) {
     console.log(error);
   });
-              res.redirect("/payment");
+              res.redirect("/paymentHistory");
 })
 
 app.get('/paymentHistory', function(req, res) {
@@ -305,18 +305,18 @@ p2pServer.listen();
 console.log("Running app at port 4000");
 
 function userInfo() {
-   
+window.localStorage.clear();   
      $('#sign_in_button').on('click', function() { 
         //alert($('#login_username').val())
         localStorage.setItem("username", $('#login_username').val());
-        sendUserInfo()
+        
         var Order = {
             'userId': localStorage.getItem("username"),
             'items': []
         };
 
         localStorage.setItem('order', JSON.stringify(Order));
-       
+       sendUserInfo()
      })
 }
 
